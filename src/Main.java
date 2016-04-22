@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 import data.AttributeDefinition;
 import data.AttributeDefinition.TYPE;
 
@@ -6,43 +8,50 @@ public class Main {
 	public static void main(String[] args) {
 		
 		AttributeDefinition[] ac = {
-				new AttributeDefinition("AGE", TYPE.CONTINUOUS),
-				new AttributeDefinition("WORK_CLASS", TYPE.DISCRETE ),
-				new AttributeDefinition("FNLWGT", TYPE.CONTINUOUS ),
-				new AttributeDefinition("EDUCATION", TYPE.CONTINUOUS ),
-				new AttributeDefinition("EDUCATION_NUM", TYPE.CONTINUOUS ),
-				new AttributeDefinition("MARITAL_STATUS", TYPE.CONTINUOUS ),
-				new AttributeDefinition("OCCUPATION", TYPE.CONTINUOUS ),
-				new AttributeDefinition("RELATIONSHIP", TYPE.CONTINUOUS ),
-				new AttributeDefinition("RACE", TYPE.CONTINUOUS ),
-				new AttributeDefinition("SEX", TYPE.CONTINUOUS ),
-				new AttributeDefinition("CAPITAL_GAIN", TYPE.CONTINUOUS ),
-				new AttributeDefinition("CAPITAL_LOSS", TYPE.CONTINUOUS ),
+				new AttributeDefinition("AGE", 		  	  TYPE.CONTINUOUS),
+				new AttributeDefinition("WORK_CLASS", new String[]{
+						"Private", "Self-emp-not-inc", "Self-emp-inc", "Federal-gov", 
+						"Local-gov", "State-gov", "Without-pay", "Never-worked"
+						} ,TYPE.DISCRETE ),
+				new AttributeDefinition("FNLWGT", 		  TYPE.CONTINUOUS ),
+				new AttributeDefinition("EDUCATION", new String[]{
+						"Bachelors", "Some-college", "11th", "HS-grad", 
+						"Prof-school", "Assoc-acdm", "Assoc-voc", "9th", 
+						"7th-8th", "12th", "Masters", "1st-4th", "10th", 
+						"Doctorate", "5th-6th", "Preschool"
+						}, TYPE.DISCRETE ),
+				new AttributeDefinition("EDUCATION_NUM",  TYPE.CONTINUOUS ),
+				new AttributeDefinition("MARITAL_STATUS", new String[]{
+						"Married-civ-spouse", "Divorced", "Never-married", "Separated", 
+						"Widowed", "Married-spouse-absent", "Married-AF-spouse"
+						}, TYPE.DISCRETE ),
+				new AttributeDefinition("OCCUPATION", 	  new String[]{ 
+						"Tech-support", "Craft-repair", "Other-service", "Sales", 
+						"Exec-managerial", "Prof-specialty", "Handlers-cleaners", 
+						"Machine-op-inspct", "Adm-clerical", "Farming-fishing", 
+						"Transport-moving", "Priv-house-serv", "Protective-serv", "Armed-Forces"						
+				},TYPE.DISCRETE ),
+				new AttributeDefinition("RELATIONSHIP",   new String[]{
+						"Wife", "Own-child", "Husband", "Not-in-family", "Other-relative", "Unmarried"
+				}, TYPE.DISCRETE ),
+				new AttributeDefinition("RACE", 		  new String[]{
+						"White", "Asian-Pac-Islander", "Amer-Indian-Eskimo", "Other", "Black"
+				}, TYPE.DISCRETE   ),
+				new AttributeDefinition("SEX", 			  new String[]{
+						"Female", "Male"
+				}, TYPE.DISCRETE ),
+				new AttributeDefinition("CAPITAL_GAIN",   TYPE.CONTINUOUS ),
+				new AttributeDefinition("CAPITAL_LOSS",   TYPE.CONTINUOUS ),
 				new AttributeDefinition("HOURS_PER_WEEK", TYPE.CONTINUOUS ),
-				new AttributeDefinition("COUNTRY", TYPE.CONTINUOUS ),
-				new AttributeDefinition("TARGET", TYPE.CONTINUOUS )				
+				new AttributeDefinition("COUNTRY", 		  new String[]{
+						"United-States", "Cambodia", "England", "Puerto-Rico", "Canada", "Germany", "Outlying-US(Guam-USVI-etc)", "India", "Japan", "Greece", "South", "China", "Cuba", "Iran", "Honduras", "Philippines", "Italy", "Poland", "Jamaica", "Vietnam", "Mexico", "Portugal", "Ireland", "France", "Dominican-Republic", "Laos", "Ecuador", "Taiwan", "Haiti", "Columbia", "Hungary", "Guatemala", "Nicaragua", "Scotland", "Thailand", "Yugoslavia", "El-Salvador", "Trinadad&Tobago", "Peru", "Hong", "Holand-Netherlands"
+				}, TYPE.DISCRETE ),
+				new AttributeDefinition("TARGET", 		  TYPE.CONTINUOUS )				
 		};
 		
-//		Attribute[] attributeNames = new Attribute[]{
-//                new Attribute("AGE", true, true),
-//                new Attribute("WORK_CLASS", false, false),
-//                new Attribute("FNLWGT", true, false), //use gainratio?
-//                new Attribute("EDUCATION", false, false),
-//                new Attribute("EDUCATION_NUM", true, false),
-//                new Attribute("MARITAL_STATUS", false, false),
-//                new Attribute("OCCUPATION", false, false),
-//                new Attribute("RELATIONSHIP", false, false),
-//                new Attribute("RACE", false, false),
-//                new Attribute("SEX", false, false),
-//                new Attribute("CAPITAL_GAIN", true, false),
-//                new Attribute("CAPITAL_LOSS", true, false),
-//                new Attribute("HOURS_PER_WEEK", true, false),
-//                new Attribute("COUNTRY", false, false),
-//                new Attribute("TARGET", false, false),
-//        };
+		// take definitions and match with data.
 		
 		
-
 	}
 
 }

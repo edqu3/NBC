@@ -27,7 +27,7 @@ public class AttributeDefinition {
 	public AttributeDefinition(String name, TYPE type) {
 		this(name, null, type);
 	}
-		
+	
 	/**
 	 * use when attribute is discrete.
 	 * @param name attribute
