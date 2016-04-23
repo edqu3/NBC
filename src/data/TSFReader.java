@@ -9,57 +9,43 @@ import java.util.List;
 
 public class TSFReader {
 
-    private List<String[]> fullList;
-//    private RowCollection rowCollection;
-    private static TSFReader ourInstance;
-    
-    private TSFReader(String path, AttributeDefinition[] ad) {
-//        CSVReader reader;
-//        try {
-//            reader = new CSVReader(new FileReader(path));
-//            try {
-//                fullList = reader.readAll();
-//                int rowCount = fullList.size();
-//                for (int i = 0; i < rowCount; i++) {
-//                    String rowValues = fullList.get(i)[0];
-//                    rows.add(Row.buildRow(attributeList, rowValues));
-//                }
-//                rowCollection = new RowCollection(rows);
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } finally{
-//        	reader.close();        	
-//        }
-//        
-    }
-    
-    // row rep.
-//    public RowCollection getRowCollection(){
-//        return this.rowCollection;
-//    }
-    
-    // 2d array of attributes for this instance.
-//    public Attribute[][] getData(){
-//        
-//        Attribute[][] attributes = new Attribute[rowCollection.getRowList().size()][rowCollection.getRowList().get(0).getAttributes().size()];
-//        for (int i = 0; i < rowCollection.getRowList().size(); i++){
-//            List<Attribute> attributes_list = rowCollection.getRowList().get(i).getAttributes();
-//            for (int j = 0; j < attributes_list.size(); j++){
-//                attributes[i][j] = attributes_list.get(j);
-//            }
-//        }
-//        return attributes;
-//    }
+    private final static String SEPARATOR = "\t";
 
-//    public static TSFReader getInstance(String path, Attribute[] attributeList) {
-//        if (ourInstance == null) {
-//            ourInstance = new TSFReader(path, attributeList);
-//        }
-//        return ourInstance;
-//    }
+    public static Attribute[][] getData(String path, AttributeDefinition[] adc){
+
+        Attribute[][] attributes = null;
+        // get data from file
+        try {
+            CSVReader reader = new CSVReader(new FileReader(path));
+            // returns string array of 1 element sub array String[][0]
+            // [0] sub array contains unparsed row string. *1
+            List<String[]> fullList = reader.readAll();
+
+            // test if file attributes and defined attributes have same length
+            String[] values = fullList.get(0)[0].split(SEPARATOR);
+            if (values.length != adc.length){
+                throw new Exception("Incorrect Attribute Definition Array, columns: " + values.length + " != " + "your columns (count): " + adc.length);
+            }
+            else{
+                attributes = new Attribute[fullList.size()][adc.length];
+                // add each attribute, values for first row
+                for (int i = 0; i < values.length; i++) {
+                    attributes[0][i] = new Attribute( adc[i], values[i]);
+                }
+                // add the rest
+                for (int i = 1; i < fullList.size(); i++) {
+                    values = fullList.get(i)[0].split(SEPARATOR);
+                    for (int j = 0; j < values.length; j++) {
+                        attributes[i][j] = new Attribute( adc[j], values[j]);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        return attributes;
+    }
 }

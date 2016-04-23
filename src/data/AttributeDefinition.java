@@ -11,30 +11,36 @@ import java.util.List;
  */
 public class AttributeDefinition {
 	
-	private final HashMap<String, String[]> attributeValueMap = new HashMap<>();
+//	private final HashMap<String, String[]> attributeValueMap = new HashMap<>();
+	private String[] values;
 	private TYPE type;
 	private int attributeIndex = -1;
 	public static int attributeCount = 0;
-	
+
+	public String name;
+
 	private AttributeDefinition(){}
 	
 	/**
 	 * use when the attribute is continuous.
 	 * Values will be made later.
 	 * @param name attribute
-	 * @param continuous attribute values
+	 * @param type attribute values
 	 */
 	public AttributeDefinition(String name, TYPE type) {
 		this(name, null, type);
 	}
-	
+
 	/**
 	 * use when attribute is discrete.
 	 * @param name attribute
 	 * @param values attribute values
 	 */
 	public AttributeDefinition(String name, String[] values, TYPE type) {
-		attributeValueMap.put(name, values);
+//		attributeValueMap.put(name, values);
+		this.name = name;
+		this.values = values;
+
 		attributeIndex = attributeCount++;
 		this.type = type;
 	}
@@ -47,7 +53,7 @@ public class AttributeDefinition {
 		return type;
 	}
 	
-	public static enum TYPE{
+	public enum TYPE{
 		CONTINUOUS,
 		DISCRETE		
 	}

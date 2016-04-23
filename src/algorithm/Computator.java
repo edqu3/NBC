@@ -1,5 +1,7 @@
 package algorithm;
 
+import data.Attribute;
+
 public class Computator {
 	
 	/**
