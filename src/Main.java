@@ -2,6 +2,7 @@ import java.util.Arrays;
 
 import algorithm.Computator;
 import data.Attribute;
+import data.AttributeCollection;
 import data.AttributeDefinition;
 import data.AttributeDefinition.TYPE;
 import data.TSFReader;
@@ -55,17 +56,19 @@ public class Main {
 		// take definitions and match with data.
 		AttributeDefinition[] adc = new AttributeDefinition[]{
 				new AttributeDefinition("OUTLOOK" , new String[]{"rainy","overcast", "sunny"}, TYPE.DISCRETE),
-				new AttributeDefinition("TEMP"    , new String[]{"hot","mild", "cold"}, 	   TYPE.DISCRETE),
+				new AttributeDefinition("TEMP"    , new String[]{"hot","mild", "cool"}, 	   TYPE.DISCRETE),
 				new AttributeDefinition("HUMIDITY", new String[]{"high","normal"},  		   TYPE.DISCRETE),
 				new AttributeDefinition("WINDY"   , new String[]{"TRUE","FALSE"}, 			   TYPE.DISCRETE),
-				new AttributeDefinition("TARGET"  , new String[]{"YES","NO"}, 			   	   TYPE.DISCRETE)
+				new AttributeDefinition("TARGET"  , new String[]{"yes","no"}, 			   	   TYPE.DISCRETE)
 		};
 
 		// get attribute array
 		Attribute[][] attributes = TSFReader.getData("simple.tsv", adc);
 
 		// Calculate frequency tables
-		Computator tator = new Computator(attributes);
+		Computator tator = new Computator(new AttributeCollection(attributes));
+
+
 
 
 		System.out.println();

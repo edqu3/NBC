@@ -7,7 +7,7 @@ public class Attribute {
     public AttributeDefinition definition;
 
     public Attribute(AttributeDefinition attributeDefinition, String value){
-        this.name = attributeDefinition.name;
+        this.name = attributeDefinition.getAttributeName();
         this.value = value;
         this.definition = attributeDefinition;
     }
