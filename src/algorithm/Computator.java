@@ -2,6 +2,7 @@ package algorithm;
 
 import data.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Computator {
@@ -21,66 +22,78 @@ public class Computator {
 	 * 
 	 */
 
-	List<Attribute[][]> freqTables;
-
+//	List<Attribute[][]> freqTables;
 
 	public Computator(AttributeCollection ac){
-
-		// calculate frequency table
-		System.out.println();
-
+		List<FrequencyTable> tables = new ArrayList<>();
+		
 		// get TARGET column
 		int targetIndex = AttributeDefinition.getAttributeIndexFromName("TARGET");
 		Column targetColumn = ac.getColumn(targetIndex);
-
-		Map<String, List<Integer>> targetComposition = getColumnComposition(targetColumn, targetIndex);
-		// add value, and column belonging to it.
-
-		for (int i = 0; i < ac.getColumnLength() - 1; i++) {
-			getFrequencyTable(targetComposition, i, ac);
+		
+		// create the frequency tables		
+		for (int columnIndex = 0; columnIndex < ac.getColumnLength() - 1; columnIndex++) {
+			String attributeName = AttributeDefinition.getAttributeNameFromIndex(columnIndex);
+			
+			Map<String, List<Integer>> columnComposition = getColumnComposition(ac.getColumn(columnIndex), columnIndex);
+			Map<String, List<Integer>> targetComposition = getColumnComposition(targetColumn, targetIndex);
+			
+			FrequencyTable table = createFrequencyTable(attributeName, columnComposition, targetComposition);
+			
+			tables.add(table);			
 		}
-
-//			Column column = ac.getColumn(i);
-//			getColumnComposition(column.column, i);
-//			System.out.println();
+		
 	}
 
-	public FrequencyTable getFrequencyTable(Map<String, List<Integer>> columnComposition, int columnIndex, AttributeCollection ac){
+	public FrequencyTable createFrequencyTable(String attributeName, Map<String, List<Integer>> columnComposition, Map<String, List<Integer>> targetComposition){
 
-		// column count in Frequency Table
-		int colCount = columnComposition.size();
-		Map<String, List<Integer>> attributeColComp = getColumnComposition(ac.getColumn(columnIndex), columnIndex);
-		int rowCount = attributeColComp.size();
+		// create table
+		FrequencyTable table = new FrequencyTable(attributeName, targetComposition, columnComposition); 
+					
+		// TODO : Calculate the entries for the frequency table
+		
+//		// column count in Frequency Table
+//		int colCount = columnComposition.size();
+//		Map<String, List<Integer>> attributeColComp = getColumnComposition(ac.getColumn(columnIndex), columnIndex);
+//		int rowCount = attributeColComp.size();
+//		
+//		// column , row
+//		FrequencyTable frequencyTable = new FrequencyTable(attributeColComp.keySet(), columnComposition.keySet());
+//
+//		Iterator<Map.Entry<String, List<Integer>>> iterator = columnComposition.entrySet().iterator();
+//
+//		Column attributeColumn = ac.getColumn(columnIndex);
+//
+//		Map<String, Integer> occurrences = new HashMap<>();
+//		// get subset of yes, no
+//		while (iterator.hasNext()){
+//			Map.Entry<String, List<Integer>> pair = iterator.next();
+//			// key
+//			String key = pair.getKey();
+//			List<Integer> indexesForValue = pair.getValue();
+//
+//			// yes rows
+//			List<Attribute> attributes = new ArrayList<>();
+//			for (Integer i : indexesForValue){
+//				Attribute attribute = ac.data[i][columnIndex];
+//				attributes.add(attribute);
+//				System.out.println();
+//			}
+//			
+//			frequencyTable.addColumn(key, attributes);
+//			
+//			attributes.toArray();
+//
+//			System.out.println();
+//
+//
+//			iterator.remove();
+//		}
 
-		FrequencyTable frequencyTable = new FrequencyTable(rowCount, attributeColComp.keySet().toArray(), colCount, columnComposition.keySet().toArray());
-
-		Iterator<Map.Entry<String, List<Integer>>> iterator = columnComposition.entrySet().iterator();
-
-		Column attributeColumn = ac.getColumn(columnIndex);
-
-		Map<String, Integer> occurrences = new HashMap<>();
-		// get subset of yes, no
-		while (iterator.hasNext()){
-			Map.Entry<String, List<Integer>> pair = iterator.next();
-			List<Integer> indexesForValue = pair.getValue();
-
-			// yes rows
-			List<Attribute> attributes = new ArrayList<>();
-			for (Integer i : indexesForValue){
-				Attribute attribute = ac.data[i][columnIndex];
-				attributes.add(attribute);
-				System.out.println();
-			}
-			attributes.toArray();
-
-			System.out.println();
-
-
-			iterator.remove();
-		}
-
-		return null;
-
+		// set table data
+		table.setTableEntry("", "", new BigDecimal(3));	// test data
+		
+		return table;
 	}
 
 
