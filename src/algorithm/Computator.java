@@ -6,7 +6,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class Computator {
-	
+
+	private final AttributeCollection ac;
+
 	/**
 	 * Frequency Table
 	 * 
@@ -25,6 +27,9 @@ public class Computator {
 //	List<Attribute[][]> freqTables;
 
 	public Computator(AttributeCollection ac){
+
+		this.ac = ac;
+
 		List<FrequencyTable> tables = new ArrayList<>();
 		
 		// get TARGET column
@@ -42,57 +47,62 @@ public class Computator {
 			
 			tables.add(table);			
 		}
-		
+
+		// test
+		FrequencyTable overcast = FrequencyTable.getFrequencyTable("WINDY");
+
+		System.out.println();
+
 	}
 
 	public FrequencyTable createFrequencyTable(String attributeName, Map<String, List<Integer>> columnComposition, Map<String, List<Integer>> targetComposition){
 
 		// create table
-		FrequencyTable table = new FrequencyTable(attributeName, targetComposition, columnComposition); 
-					
-		// TODO : Calculate the entries for the frequency table
-		
-//		// column count in Frequency Table
-//		int colCount = columnComposition.size();
-//		Map<String, List<Integer>> attributeColComp = getColumnComposition(ac.getColumn(columnIndex), columnIndex);
-//		int rowCount = attributeColComp.size();
-//		
-//		// column , row
-//		FrequencyTable frequencyTable = new FrequencyTable(attributeColComp.keySet(), columnComposition.keySet());
-//
-//		Iterator<Map.Entry<String, List<Integer>>> iterator = columnComposition.entrySet().iterator();
-//
-//		Column attributeColumn = ac.getColumn(columnIndex);
-//
-//		Map<String, Integer> occurrences = new HashMap<>();
-//		// get subset of yes, no
-//		while (iterator.hasNext()){
-//			Map.Entry<String, List<Integer>> pair = iterator.next();
-//			// key
-//			String key = pair.getKey();
-//			List<Integer> indexesForValue = pair.getValue();
-//
-//			// yes rows
-//			List<Attribute> attributes = new ArrayList<>();
-//			for (Integer i : indexesForValue){
-//				Attribute attribute = ac.data[i][columnIndex];
-//				attributes.add(attribute);
-//				System.out.println();
-//			}
-//			
-//			frequencyTable.addColumn(key, attributes);
-//			
-//			attributes.toArray();
-//
-//			System.out.println();
-//
-//
-//			iterator.remove();
-//		}
+		FrequencyTable table = new FrequencyTable(attributeName, columnComposition, targetComposition);
 
-		// set table data
-		table.setTableEntry("", "", new BigDecimal(3));	// test data
-		
+		Iterator<Map.Entry<String, List<Integer>>> targetIterator = targetComposition.entrySet().iterator();
+
+		boolean zeroProbabilityFound = true;						// assume there is 1 or more unseen classes *1
+
+		while (targetIterator.hasNext()){
+			Map.Entry<String, List<Integer>> targetClass = targetIterator.next();			// columns in frequency table
+			Iterator<Map.Entry<String, List<Integer>>> columnIterator = columnComposition.entrySet().iterator();
+			while (columnIterator.hasNext()) {
+				Map.Entry<String, List<Integer>> attributeClass = columnIterator.next();    // rows in frequency table
+
+				List<Integer> targetIndexes    = targetClass.getValue();    // "yes" class rows
+				List<Integer> attributeIndexes = attributeClass.getValue();
+
+				// TODO: Redundant iterations
+				// FIXME: 4/25/2016, can be linear.
+				int matches = 0;
+				for (int i = 0; i < targetIndexes.size(); i++) {
+					for (int j = 0; j < attributeIndexes.size(); j++) {
+						Integer v1 = targetIndexes.get(i);
+						Integer v2 = attributeIndexes.get(j);
+						if (v1.intValue() == v2.intValue()) {
+							matches++;
+							zeroProbabilityFound = false;					//*1
+						}
+					}
+				}
+				if (matches == 0){
+					zeroProbabilityFound = true;
+					System.out.println("Zero probability entry found under class " + targetClass.getKey());
+				}
+				table.setTableEntry(attributeClass.getKey(), targetClass.getKey(), new BigDecimal(matches));
+			}
+		}
+
+		// TODO : calculate marginals and handle unseen classes. (causes 0 probability)
+		// FIXME: 4/25/2016 add 1 to each row class.
+		// add 1 to all entries in table, update margins.
+		if (zeroProbabilityFound){
+
+		}
+
+		table.showTable();
+
 		return table;
 	}
 
@@ -147,9 +157,7 @@ public class Computator {
 	// given by the new data. We take the max of P(PLAY_TENNIS = YES) v.s. P(PLAY_TENNIS = NO)
 	// P( PLAY_TENNIS = YES ) * P(OUTLOOK = overcast | PLAY_TENNIS = YES) * P(TEMPERATURE = mild | PLAY_TENNIS = YES ) * P(WIND = strong | PLAY_TENNIS = YES )
 	// P( PLAY_TENNIS = NO ) * P(OUTLOOK = overcast | PLAY_TENNIS = NO) * P(TEMPERATURE = mild | PLAY_TENNIS = NO ) * P(WIND = strong | PLAY_TENNIS = NO )
-	// and we take the max, and the new data is classified accordingly.	
-	
-	// CODE
+	// and we take the max, and the new data is classified accordingly.
 	
 	
 	

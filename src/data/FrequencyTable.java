@@ -1,24 +1,21 @@
 package data;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FrequencyTable {
 
     public BigDecimal[][] table;
-    
-    public static Map<String, FrequencyTable> tables = new HashMap<String, FrequencyTable>();
+	public final String tableName;
+
+    private static Map<String, FrequencyTable> tables = new HashMap<>();
     
 	Map<String, Integer> rowMap = new HashMap<>();			// rows, values for Attribute
 	Map<String, Integer> colMap = new HashMap<>();			// columns, Class (yes, no)
 
     public FrequencyTable(String attributeName, Map<String, List<Integer>> columnComposition, Map<String, List<Integer>> targetComposition) {
     	tables.put(attributeName, this);
+		tableName = attributeName;
     	
     	Set<String> rowKeys = columnComposition.keySet();	// rows, values for Attribute
     	Set<String> colKeys = targetComposition.keySet();	// columns, Class (yes, no)
@@ -31,7 +28,6 @@ public class FrequencyTable {
     	while (rowIterator.hasNext()){
 	    	String value = rowIterator.next();
 	    	rowMap.put(value, rowIndex);
-	    	rowIterator.remove();
 	    	rowIndex++;
     	}
     	
@@ -40,7 +36,6 @@ public class FrequencyTable {
     	while (colIterator.hasNext()){
 	    	String value = colIterator.next();
 	    	colMap.put(value, colIndex);
-	    	colIterator.remove();
 	    	colIndex++;
     	}
     	
@@ -52,36 +47,42 @@ public class FrequencyTable {
     	
 	}
     
-    public void setTableEntry(int row, int col){
-    	    	    	    	    	
-    }
-    
-    public void setTableEntry(String row, String col, BigDecimal o){
+    public void setTableEntry(String row, String col, BigDecimal e){
     	Integer rowIndex = rowMap.get(row);
     	Integer colIndex = colMap.get(col);
-    	table[rowIndex][colIndex] = o;    	
+    	table[rowIndex][colIndex] = e;
     }
-    
-    private int getKeyIndex(String key){
-    	return 0;    	    	
-    }
-    
-    public void addColumn(String key, List<Attribute> col){
-    	int keyIndex = getKeyIndex(key);
-    	
-    	// key = decision and attributes are the values
-    	for (int i = 0; i < col.size(); i++) {
-//    		data[keyIndex][i] = col.get(i).value;
-    		col.get(i);
-			
+
+	public BigDecimal getTableEntry(String row, String col){
+		Integer rowIndex = rowMap.get(row);
+		Integer colIndex = colMap.get(col);
+		return table[rowIndex][colIndex];
+	}
+
+	public static FrequencyTable getFrequencyTable(String attribute){
+		return tables.get(attribute);
+	}
+
+	public void showTable(){
+
+		System.out.println("------------------------------------------------");
+		System.out.println("Frequency Table for " + this.tableName);
+		System.out.println("------------------------------------------------");
+
+		Iterator<String> iterator = colMap.keySet().iterator();
+		String header = "";
+		while (iterator.hasNext()){
+			header += iterator.next() + "\t";
 		}
-    	
-    	
-    }
+		System.out.printf("%28s%n", header);
 
-    public void addRow(){
+		Iterator<String> iterator1 = rowMap.keySet().iterator();
+		while (iterator1.hasNext()){
+			String row = iterator1.next();
+			System.out.printf("%10s%20s%n", row, Arrays.toString(table[rowMap.get(row)]));
+		}
 
-    }
 
+	}
 
 }
