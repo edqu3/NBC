@@ -50,7 +50,7 @@ public class Computator {
 
 		// test
 		FrequencyTable overcast = FrequencyTable.getFrequencyTable("WINDY");
-
+		
 		System.out.println();
 
 	}
@@ -62,15 +62,13 @@ public class Computator {
 
 		Iterator<Map.Entry<String, List<Integer>>> targetIterator = targetComposition.entrySet().iterator();
 
-		boolean zeroProbabilityFound = true;						// assume there is 1 or more unseen classes *1
-
 		while (targetIterator.hasNext()){
 			Map.Entry<String, List<Integer>> targetClass = targetIterator.next();			// columns in frequency table
 			Iterator<Map.Entry<String, List<Integer>>> columnIterator = columnComposition.entrySet().iterator();
 			while (columnIterator.hasNext()) {
 				Map.Entry<String, List<Integer>> attributeClass = columnIterator.next();    // rows in frequency table
 
-				List<Integer> targetIndexes    = targetClass.getValue();    // "yes" class rows
+				List<Integer> targetIndexes    = targetClass.getValue();    				// "yes" class rows
 				List<Integer> attributeIndexes = attributeClass.getValue();
 
 				// TODO: Redundant iterations
@@ -82,31 +80,29 @@ public class Computator {
 						Integer v2 = attributeIndexes.get(j);
 						if (v1.intValue() == v2.intValue()) {
 							matches++;
-							zeroProbabilityFound = false;					//*1
 						}
 					}
 				}
 				if (matches == 0){
-					zeroProbabilityFound = true;
-					System.out.println("Zero probability entry found under class " + targetClass.getKey());
+					FrequencyTable.adjustForZeroFrequency = true;
+					System.out.println("Zero probability entry found in " + table.tableName + 
+							" Attribute under class " + targetClass.getKey());
 				}
 				table.setTableEntry(attributeClass.getKey(), targetClass.getKey(), new BigDecimal(matches));
 			}
 		}
-
+		
 		// TODO : calculate marginals and handle unseen classes. (causes 0 probability)
 		// FIXME: 4/25/2016 add 1 to each row class.
 		// add 1 to all entries in table, update margins.
-		if (zeroProbabilityFound){
 
-		}
-
+		table.adjustForZeroFrequencyProblem();
+		table.calculateMarginals();
+		
 		table.showTable();
 
 		return table;
 	}
-
-
 
 	/**
 	 * returns a map where keys = class attributes and values = List containing the indexes where that class occurs.
