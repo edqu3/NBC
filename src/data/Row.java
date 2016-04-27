@@ -12,4 +12,9 @@ public class Row {
         rowCount++;
     }
 
+    public String getTargetClass(){
+        Integer target = AttributeDefinition.getAttributeIndexFromName("TARGET");
+        return row[target].value;
+    }
+
 }

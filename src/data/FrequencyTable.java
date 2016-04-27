@@ -1,16 +1,35 @@
 package data;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class FrequencyTable {
+/**
+ * Frequency Table
+ *
+ * 			   	    <<TARGET>>
+ * 					YES		NO
+ * 				x	4		3		7/13
+ *<<ATTRIBUTE>>
+ * 				y	3		3		6/13
+ * 					7/13	6/13
+ *
+ *
+ * Total = 4 + 3 + 3 + 3 = 13
+ *
+ */
+public class FrequencyTable{
 
-    private static Map<String, FrequencyTable> tables = new HashMap<>();
+	private static Map<String, FrequencyTable> tables 					= new HashMap<>();
+	private static Map<String, BigDecimal> 	   targetClassProbabilities = new HashMap<>();
+	private static boolean targetClassProbabilitiesCalculated 		    = false;
     private final static BigDecimal EPSILON = BigDecimal.ONE;
-    public static boolean adjustForZeroFrequency = false;			// boolean for zero frequency problem				
+	private final static MathContext MC     = new MathContext(5,RoundingMode.HALF_UP);
+    public  boolean adjustForZeroFrequency = false;					// boolean for zero frequency problem
 
-    public BigDecimal[][] table;
+    private BigDecimal[][] table;
 	public final String tableName;
     
 	private Map<String, Integer> rowMap = new HashMap<>();			// rows, values for Attribute
@@ -22,10 +41,31 @@ public class FrequencyTable {
 
     public FrequencyTable(String attributeName, Map<String, List<Integer>> columnComposition, Map<String, List<Integer>> targetComposition) {
     	tables.put(attributeName, this);
+
+		// run once
+		if (!targetClassProbabilitiesCalculated){
+			// Calculate the P(C) target class probabilities.
+			Iterator<Entry<String, List<Integer>>> iterator = targetComposition.entrySet().iterator();
+			BigDecimal total = BigDecimal.ZERO;
+			while (iterator.hasNext()){
+				Entry<String, List<Integer>> next = iterator.next();
+				total = total.add( new BigDecimal(next.getValue().size()));
+			}
+
+			iterator = targetComposition.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Entry<String, List<Integer>> next = iterator.next();
+				// calculate P(C)
+				BigDecimal pc = new BigDecimal(next.getValue().size()).divide(total, MC);
+				targetClassProbabilities.put(next.getKey(), pc);
+			}
+			targetClassProbabilitiesCalculated = true;
+		}
+
 		tableName = attributeName;
 		
-    	Set<String> rowKeys = columnComposition.keySet();	// rows, values for Attribute
-    	Set<String> colKeys = targetComposition.keySet();	// columns, Class (yes, no)
+    	Set<String> rowKeys = columnComposition.keySet();			// rows, values for Attribute
+    	Set<String> colKeys = targetComposition.keySet();			// columns, Class (yes, no)
     	
     	int rows = rowKeys.size();
     	int cols = colKeys.size();
@@ -86,6 +126,7 @@ public class FrequencyTable {
 		Iterator<String> iterator1 = rowMap.keySet().iterator();
 		while (iterator1.hasNext()){
 			String row = iterator1.next();
+			//TODO: create a better display of table.
 //			for (int i = 0; i < table[rowMap.get(row)].length; i++) {
 //				System.out.println( table[rowMap.get(row)][i] );												
 //			}
@@ -97,58 +138,100 @@ public class FrequencyTable {
 	/**
 	 * Additive smoothing implementation
 	 */
-	public void adjustForZeroFrequencyProblem() {
-		// if the table has already been adjusted for an instance of zero probability, don't proceed.
-		if (adjustForZeroFrequency == false) {
-			return;			
-		}
-		
-		// Add Epsilon to all the entries in all the frequency tables.
-		Iterator<Entry<String, FrequencyTable>> iterator = tables.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<String,data.FrequencyTable> entry = (Map.Entry<String,data.FrequencyTable>) iterator.next();
-			FrequencyTable fTable = entry.getValue();
-			
+	public static void adjustForZeroFrequencyProblem() {
+		// if any zero probability entries found, smooth counts
+		boolean adjust = false;
+		Iterator<Entry<String, FrequencyTable>> tableIterator = FrequencyTable.tables.entrySet().iterator();
+		while (tableIterator.hasNext()){
+			Entry<String, FrequencyTable> t = tableIterator.next();
+			FrequencyTable fTable = t.getValue();
 			BigDecimal[][] table = fTable.table;
-			
+
 			for (int i = 0; i < table.length; i++) {
 				for (int j = 0; j < table[i].length; j++) {
-					table[i][j] = table[i][j].add(EPSILON);
+					if (table[i][j].compareTo(BigDecimal.ZERO) == 0){
+						fTable.adjustForZeroFrequency = true;
+						System.out.println("Zero probability entry found in " + fTable.tableName+
+							" Attribute under class [" + fTable.indexColMap.get(j) + "]");
+						adjust = true;
+					}
 				}
-			}			
-			
-		}		
-	}
-
-	public void calculateMarginals(){
-		BigDecimal entropySum = new BigDecimal(0);
-		
-		for (int i = 0; i < table.length; i++) {
-			for (int j = 0; j < table[i].length; j++) {
-				entropySum = entropySum.add(table[i][j]);
 			}
 		}
-		
-		// marginal of rows
-		for (int i = 0; i < table.length; i++) {			
-			BigDecimal rowSum = new BigDecimal(0);		
+		if (adjust) {
+			tableIterator = FrequencyTable.tables.entrySet().iterator();
+			while (tableIterator.hasNext()) {
+				Entry<String, FrequencyTable> t = tableIterator.next();
+				FrequencyTable fTable = t.getValue();
+				BigDecimal[][] table = fTable.table;
+				// Add Epsilon to all the entries in all the frequency tables.
+				for (int i = 0; i < table.length; i++) {
+					for (int j = 0; j < table[i].length; j++) {
+						table[i][j] = table[i][j].add(EPSILON);
+					}
+				}
+			}
+		}
+
+		tableIterator = FrequencyTable.tables.entrySet().iterator();
+		while (tableIterator.hasNext()) {
+			Entry<String, FrequencyTable> t = tableIterator.next();
+			t.getValue().calculateProbabilities();
+			t.getValue().showTable();
+			System.out.println("========================END========================");
+		}
+
+	}
+
+
+	private void calculateProbabilities(){
+		BigDecimal dataCount = BigDecimal.ZERO;
+
+		System.out.println("========================BEGIN========================");
+
+		// count all instances of data
+		for (int i = 0; i < table.length; i++) {
+			for (int j = 0; j < table[i].length; j++) {
+				dataCount = dataCount.add(table[i][j]);
+			}
+		}
+
+		// calculate probabilities for marginal of rows
+		System.out.println("------------------------------");
+		System.out.println("Row Marginals");
+		BigDecimal rowSum;
+		for (int i = 0; i < table.length; i++) {
+			rowSum = BigDecimal.ZERO;
 			for (int j = 0; j < table[i].length; j++) {
 				rowSum = rowSum.add(table[i][j]);
 			}
-			marginals.put(indexRowMap.get(i), rowSum);
-			System.out.println("Marginal for " + indexRowMap.get(i) + " " + rowSum);
+			marginals.put(indexRowMap.get(i), rowSum.divide(dataCount, MC));
+			System.out.println("Marginal for " + indexRowMap.get(i) + " " + rowSum.divide(dataCount, MC));
 		}
-		
-		//marginal of columns
+
+		// marginal of columns
+		System.out.println("------------------------------");
+		System.out.println("Column Marginals");
+		BigDecimal colSum;
 		for (int i = 0; i < table[0].length; i++) {
-			BigDecimal rowSum = new BigDecimal(0);
-			rowSum = rowSum.add(table[0][i]);
-			marginals.put(indexRowMap.get(i), rowSum);
-			System.out.println("Marginal for " + indexColMap.get(i) + " " + rowSum);
+			colSum = BigDecimal.ZERO;
+			for (int j = 0; j < table.length; j++) {
+				colSum = colSum.add(table[j][i]);
+			}
+			marginals.put(indexColMap.get(i), colSum.divide(dataCount, MC));
+			System.out.println("Marginal for " + indexColMap.get(i) + " " + colSum.divide(dataCount, MC));
 		}
-		
-		
-		
+
+		// calculate conditional probabilities
+		for (int i = 0; i < table.length; i++) {
+			for (int j = 0; j < table[i].length; j++) {
+				table[i][j] = table[i][j].divide(marginals.get(indexColMap.get(j)).multiply(dataCount), MC);
+//				System.out.println("P( " + indexRowMap.get(i) + " | " + indexColMap.get(j) + " )= " + table[i][j] );
+			}
+		}
 	}
-	
+
+	public static BigDecimal getTargetClassProbability(String targetClass) {
+		return targetClassProbabilities.get(targetClass);
+	}
 }

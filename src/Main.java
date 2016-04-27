@@ -1,16 +1,15 @@
-import java.util.Arrays;
-
-import algorithm.Computator;
 import data.Attribute;
 import data.AttributeCollection;
 import data.AttributeDefinition;
 import data.AttributeDefinition.TYPE;
 import data.TSFReader;
+import helper.kFoldCrossValidation;
+
 
 public class Main {
 
 	public static void main(String[] args) {
-		
+
 //		AttributeDefinition[] adc = {
 //				new AttributeDefinition("AGE", 		  	  TYPE.CONTINUOUS),
 //				new AttributeDefinition("WORK_CLASS", new String[]{
@@ -52,7 +51,7 @@ public class Main {
 //				}, TYPE.DISCRETE ),
 //				new AttributeDefinition("TARGET", 		  TYPE.CONTINUOUS )
 //		};
-		
+
 		// take definitions and match with data.
 		AttributeDefinition[] adc = new AttributeDefinition[]{
 				new AttributeDefinition("OUTLOOK" , new String[]{"rainy","overcast", "sunny"}, TYPE.DISCRETE),
@@ -65,11 +64,9 @@ public class Main {
 		// get attribute array
 		Attribute[][] attributes = TSFReader.getData("simple.tsv", adc);
 
-		// Calculate frequency tables
-		Computator tator = new Computator(new AttributeCollection(attributes));
+		AttributeCollection attributeCollection = new AttributeCollection(attributes);
 
-
-
+		kFoldCrossValidation.crossValidate(attributeCollection, 5);
 
 		System.out.println();
 

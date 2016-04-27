@@ -41,7 +41,7 @@ public class AttributeCollection {
     }
 
     public int getRowLength(){
-        return columns.length;
+        return rows.length;
     }
 
     public Column getColumn(int i){
@@ -50,5 +50,17 @@ public class AttributeCollection {
 
     public Row getRow(int i){
         return rows[i];
+    }
+
+    public static AttributeCollection listToAttributeCollection(List<Attribute[]> attributes){
+        Attribute[][] ac = new Attribute[attributes.size()][attributes.get(0).length];
+
+        for (int i = 0; i < attributes.size(); i++) {
+            for (int j = 0; j < attributes.get(i).length; j++) {
+                ac[i][j] = attributes.get(i)[j];
+            }
+        }
+
+        return new AttributeCollection(ac);
     }
 }
