@@ -40,12 +40,10 @@ public class ProbabilityModelMaker {
 				break;
 			case CONTINUOUS:
 				GaussianDistribution gaussianDistribution = new GaussianDistribution(attributeColumn, targetComposition);
-				
+				gaussianDistribution.display();
 				
 				ProbabilisticModels.add(gaussianDistribution);
 				break;
-			default:
-				break;			
 			}			
 		}
 		
@@ -106,6 +104,9 @@ public class ProbabilityModelMaker {
 		}
 
 		for (int i = 0; i < col.length; i++) {
+			if (col[i].value.equals("?")){
+				continue;
+			}
 			List<Integer> indexes = valueArrays.get(col[i].value);
 			indexes.add(i);
 		}

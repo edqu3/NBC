@@ -106,16 +106,16 @@ public class FrequencyTable implements PriorGetter{
 
 	public void showTable(){
 
-		System.out.println("------------------------------------------------");
+		System.out.println("------------------------------------------------------------------------------------------------");
 		System.out.println("Frequency Table for " + this.tableName + " [adjusted for zero frequency: " + adjustForZeroFrequency + "]");
-		System.out.println("------------------------------------------------");
+		System.out.println("------------------------------------------------------------------------------------------------");
 
 		Iterator<String> iterator = colMap.keySet().iterator();
 		String header = "";
 		while (iterator.hasNext()){
 			header += iterator.next() + "\t";
 		}
-		System.out.printf("%28s%n", header);
+		System.out.printf("%56s%n", header);
 
 		Iterator<String> iterator1 = rowMap.keySet().iterator();
 		while (iterator1.hasNext()){
@@ -124,7 +124,7 @@ public class FrequencyTable implements PriorGetter{
 //			for (int i = 0; i < table[rowMap.get(row)].length; i++) {
 //				System.out.println( table[rowMap.get(row)][i] );												
 //			}
-			System.out.printf("%10s%20s%n", row, Arrays.toString(table[rowMap.get(row)]));
+			System.out.printf("%20s%40s%n", row, Arrays.toString(table[rowMap.get(row)]));
 		}
 		
 	}
@@ -145,8 +145,8 @@ public class FrequencyTable implements PriorGetter{
 				for (int j = 0; j < table[i].length; j++) {
 					if (table[i][j].compareTo(BigDecimal.ZERO) == 0){
 						fTable.adjustForZeroFrequency = true;
-						System.out.println("Zero probability entry found in " + fTable.tableName+
-							" Attribute under class [" + fTable.indexColMap.get(j) + "]");
+//						System.out.println("Zero probability entry found in " + fTable.tableName+
+//							" Attribute under class [" + fTable.indexColMap.get(j) + "]");
 						adjust = true;
 					}
 				}

@@ -24,16 +24,13 @@ public class GaussianDistribution implements PriorGetter {
 	private static final String MISSING_STRING = "?";
 		
 	// map for target classes and their probability
-	private Map<String, BigDecimal> columnDistribution;			// p(t = c1) + p(t = c2) + ... + p(t = cn) = 1
-	private Map<String, BigDecimal> means;
-	private Map<String, BigDecimal> standardDeviations;
+	// p(t = c1) + p(t = c2) + ... + p(t = cn) = 1
+	private Map<String, BigDecimal> columnDistribution = new HashMap<>();
+	private Map<String, BigDecimal> targetMeans = new HashMap<>();
+	private Map<String, BigDecimal> targetStandardDeviations = new HashMap<>();
 	
 	String attributeName;
-	
-	BigDecimal mean;
-	BigDecimal variance;
-	BigDecimal standardDeviation;	
-	
+
 	public GaussianDistribution(Column columnAttribute, Map<String, List<Integer>> targetComposition) {
 		attributeName = columnAttribute.getAttributeName();		
 		gDistributions.put(attributeName, this);
@@ -63,7 +60,7 @@ public class GaussianDistribution implements PriorGetter {
 			Entry<String, List<Integer>> next = iterator.next();
 			// list of all indexes under target class c
 			List<Integer>   indexes 		   = next.getValue();
-			List<Attribute> matchingAttributes = new ArrayList<Attribute>();
+			List<Attribute> matchingAttributes = new ArrayList<>();
 			for (int i = 0; i < indexes.size(); i++) {
 				// get index where target class is c
 				Integer index = indexes.get(i);
@@ -78,13 +75,15 @@ public class GaussianDistribution implements PriorGetter {
 			Column subColumn = new Column(ma);
 			
 			// calculate MEAN,VAR,SD for these matching attributes
-			means.put(next.getKey(), calculateMean(subColumn));
-			standardDeviations.put(next.getKey(), BigFunctions.sqrt(calculateVariance(subColumn), 4));		
+			targetMeans.put(next.getKey(), calculateMean(subColumn));
+			BigDecimal variance = calculateVariance(subColumn, next.getKey());
+			if (variance.compareTo(BigDecimal.ZERO) == 0){
+				targetStandardDeviations.put(next.getKey(), BigDecimal.ZERO);
+
+			}else{
+				targetStandardDeviations.put(next.getKey(), BigFunctions.sqrt(variance,4));
+			}
 		}
-		
-//		mean = calculateMean(columnAttribute);
-//		variance = calculateVariance(columnAttribute);
-//		standardDeviation = BigFunctions.sqrt(variance, 4);						
 	}
 	
 	public BigDecimal calculateMean(Column column){
@@ -106,7 +105,7 @@ public class GaussianDistribution implements PriorGetter {
 		return sum.divide(total, MC);
 	}
 	
-	private BigDecimal calculateVariance(Column column){
+	private BigDecimal calculateVariance(Column column, String targetClass){
 		Attribute[] col = column.column;
 		
 		BigDecimal sum = BigDecimal.ZERO;	
@@ -117,37 +116,44 @@ public class GaussianDistribution implements PriorGetter {
 			String value = col[i].value;
 			if (!value.equals(MISSING_STRING)) {
 				BigDecimal numValue = new BigDecimal(value);					// x_i
+				BigDecimal mean = targetMeans.get(targetClass);
 				//square difference
-				BigDecimal squaredDiff = numValue.subtract(mean).multiply(numValue.subtract(mean));	
+				BigDecimal squaredDiff = numValue.subtract(mean).multiply(numValue.subtract(mean));
 				sum = sum.add(squaredDiff);
 			}
 		}		
 		return sum.divide(total, MC);
 	}	
 	
-	public static GaussianDistribution getGaussianDisribution(String attribute){
+	public static GaussianDistribution getGaussianDistribution(String attribute){
 		return gDistributions.get(attribute);
 	}
 	
 	// x = attribute column name, c = target class name
 	@Override
 	public BigDecimal getPriorProbability(String x, String c) {
+		// When the mean or variance is 0. return 1 so we don't end up with a 0 probability in the chain.
+		// Since this attribute does not contribute to the prior, we can safely ignore it.
+		if ( targetMeans.get(c).compareTo(BigDecimal.ZERO) == 0 || targetStandardDeviations.get(c).compareTo(BigDecimal.ZERO) == 0){
+			return BigDecimal.ONE;
+		}
 		/// calculate the PDF using
 		/// [1 / (sd * sqrt( 2 * pi ))] * e ^ [-1 * ( (x - mean)^2 / (2*variance) ]   
 		
-		// sd * sqrt( 2 * pi )		
+		// sd * sqrt( 2 * pi )
+		BigDecimal standardDeviation = targetStandardDeviations.get(c);
 		BigDecimal denominator = standardDeviation.multiply( 
 				BigFunctions.sqrt(new BigDecimal(2).multiply(pi, MC), 4), MC);		
 		// (x - mean)^2
 		// TODO: get the value for x
-		BigDecimal attributeValue = BigDecimal.ZERO;
-		BigDecimal mean = BigDecimal.ZERO;
+		BigDecimal attributeValue = new BigDecimal(x);
+		BigDecimal mean = targetMeans.get(c);
 		BigDecimal sqDiff = attributeValue.subtract(mean).multiply(attributeValue.subtract(mean), MC);
 		// 2 * variance 
-		BigDecimal variance = BigDecimal.ZERO;
-		BigDecimal dubVariancle = variance.multiply(new BigDecimal(2));
+		BigDecimal variance = targetStandardDeviations.get(c).multiply(targetStandardDeviations.get(c),MC);
+		BigDecimal dubVariance = variance.multiply(new BigDecimal(2));
 		// [-1 * ( (x - mean)^2 / (2*variance) ]
-		BigDecimal exponent = sqDiff.divide(dubVariancle,MC).negate();
+		BigDecimal exponent = sqDiff.divide(dubVariance,MC).negate();
 		// e ^ [-1 * ( (x - mean)^2 / (2*variance)
 		BigDecimal numerator = BigFunctions.exp(exponent, 4);
 		
@@ -161,4 +167,19 @@ public class GaussianDistribution implements PriorGetter {
 		return null;
 	}
 
+	public void display() {
+		System.out.println("++++++++++++++++++++++++++++++++++++++++");
+		System.out.println("Created Gaussian Distribution for " + attributeName);
+		System.out.println("++++++++++++++++++++++++++++++++++++++++");
+		Iterator<Entry<String, BigDecimal>> iterator = targetMeans.entrySet().iterator();
+		Iterator<Entry<String, BigDecimal>> iterator1 = targetStandardDeviations.entrySet().iterator();
+		while (iterator.hasNext()){
+			Entry<String, BigDecimal> next  = iterator.next();
+			Entry<String, BigDecimal> next1 = iterator1.next();
+
+			System.out.println("Target Class Means: " + next.getKey() + " = " + next.getValue() + ", " +  next1.getValue() );
+
+		}
+
+	}
 }

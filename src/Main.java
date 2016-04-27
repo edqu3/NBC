@@ -49,7 +49,9 @@ public class Main {
 				new AttributeDefinition("COUNTRY", 		  new String[]{
 						"United-States", "Cambodia", "England", "Puerto-Rico", "Canada", "Germany", "Outlying-US(Guam-USVI-etc)", "India", "Japan", "Greece", "South", "China", "Cuba", "Iran", "Honduras", "Philippines", "Italy", "Poland", "Jamaica", "Vietnam", "Mexico", "Portugal", "Ireland", "France", "Dominican-Republic", "Laos", "Ecuador", "Taiwan", "Haiti", "Columbia", "Hungary", "Guatemala", "Nicaragua", "Scotland", "Thailand", "Yugoslavia", "El-Salvador", "Trinadad&Tobago", "Peru", "Hong", "Holand-Netherlands"
 				}, TYPE.DISCRETE ),
-				new AttributeDefinition("TARGET", 		  TYPE.CONTINUOUS )
+				new AttributeDefinition("TARGET", 		  new String[]{
+						"<=50K",">50K"
+				},TYPE.DISCRETE)
 		};
 
 		
@@ -62,7 +64,7 @@ public class Main {
 //		};
 
 		// get attribute data
-		Attribute[][] attributes = TSFReader.getData("data.tsv", adc);
+		Attribute[][] attributes = TSFReader.getData("simple-data-continuous.tsv", adc);
 		AttributeCollection attributeCollection = new AttributeCollection(attributes);
 		
 		// cross validate

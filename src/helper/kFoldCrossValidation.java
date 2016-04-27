@@ -26,7 +26,7 @@ public class kFoldCrossValidation {
 
         List<List<Attribute[]>> partitions   = partition(ac.data, k_folds);
         List<Attribute[]> 		trainingSet  = new ArrayList<>();
-        List<Attribute[]> 		testingSet   = new ArrayList<>();
+        List<Attribute[]> 		testingSet;
         
         BigDecimal accuracy = new BigDecimal(0);
 
@@ -38,7 +38,7 @@ public class kFoldCrossValidation {
                     trainingSet.addAll(partitions.get(trainingIndex));
                 }
             }
-            System.out.println("\n===============Cross Validation===============");
+            System.out.println("\n=============================================Cross Validation=============================================");
             System.out.println("Creating training set for test set [" + testIndex + "]");
 
             testingSet = partitions.get(testIndex);
@@ -54,9 +54,9 @@ public class kFoldCrossValidation {
             BigDecimal a = Classifier.classify(newTestingSet);
 
             accuracy = accuracy.add(a);
-            System.out.println("-------------------------------------------------------");
+            System.out.println("--------------------------------------------------------------------------------------------------------------");
             System.out.println("Accuracy for testing set " + testIndex + " is " + a);
-            System.out.println("-------------------------------------------------------");
+            System.out.println("--------------------------------------------------------------------------------------------------------------");
             // clear and move on to next fold
             trainingSet.clear();
         }

@@ -76,8 +76,8 @@ public class Classifier {
 			//TODO: use interface getPriorProbability instead and get rid of switch statement
 			case CONTINUOUS:
 
-				GaussianDistribution gaussianDisribution = GaussianDistribution.getGaussianDisribution(attribute.name);
-				p = gaussianDisribution.getPriorProbability(attribute.value, targetClass);				
+				GaussianDistribution gaussianDistribution = GaussianDistribution.getGaussianDistribution(attribute.name);
+				p = gaussianDistribution.getPriorProbability(attribute.value, targetClass);
 				break;				
 			case DISCRETE:
 				// get table for this attribute
