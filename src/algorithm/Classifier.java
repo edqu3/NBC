@@ -1,7 +1,6 @@
 package algorithm;
 
 import data.*;
-import data.AttributeDefinition.TYPE;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -74,8 +73,11 @@ public class Classifier {
 			BigDecimal p = BigDecimal.ZERO;
 			
 			switch (attribute.definition.attributeType()) {
+			//TODO: use interface getPriorProbability instead and get rid of switch statement
 			case CONTINUOUS:
-																
+
+				GaussianDistribution gaussianDisribution = GaussianDistribution.getGaussianDisribution(attribute.name);
+				p = gaussianDisribution.getPriorProbability(attribute.value, targetClass);				
 				break;				
 			case DISCRETE:
 				// get table for this attribute
@@ -85,7 +87,6 @@ public class Classifier {
 				break;			
 			default:
 				break;
-				
 			}
 
 			likelihood = likelihood.multiply(p, MC);

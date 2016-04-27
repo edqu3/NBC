@@ -19,6 +19,5 @@ public interface PriorGetter {
 	 */
 	public BigDecimal getMarginalProbability(String x);
 	
-	
 
 }

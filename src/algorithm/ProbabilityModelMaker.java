@@ -5,15 +5,15 @@ import data.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class FrequencyTableMaker {
-
-
+public class ProbabilityModelMaker {
+	
 	// not needed?
 //	private final AttributeCollection ac;
-
+	
 	private List<FrequencyTable> tables;
+	private List<PriorGetter> ProbabilisticModels = new ArrayList<>();
 
-	public FrequencyTableMaker(AttributeCollection ac){
+	public ProbabilityModelMaker(AttributeCollection ac){
 
 		tables = new ArrayList<>();
 		
@@ -21,19 +21,35 @@ public class FrequencyTableMaker {
 		int targetIndex = AttributeDefinition.getAttributeIndexFromName("TARGET");
 		Column targetColumn = ac.getColumn(targetIndex);
 		
-		// create the frequency tables
+		Map<String, List<Integer>> targetComposition = getColumnComposition(targetColumn, targetIndex);
+		
+		// create the probabilistic models
 		for (int columnIndex = 0; columnIndex < ac.getColumnLength() - 1; columnIndex++) {
 			String attributeName = AttributeDefinition.getAttributeNameFromIndex(columnIndex);
+			Column attributeColumn = ac.getColumn(columnIndex);
 			
-			Map<String, List<Integer>> columnComposition = getColumnComposition(ac.getColumn(columnIndex), columnIndex);
-			Map<String, List<Integer>> targetComposition = getColumnComposition(targetColumn, targetIndex);
-			
-			FrequencyTable table = createFrequencyTable(attributeName, columnComposition, targetComposition);
-			
-			tables.add(table);			
+			// get TYPE of data
+			switch (attributeColumn.getDataType()){			
+			case DISCRETE:
+				
+				Map<String, List<Integer>> columnComposition = getColumnComposition(attributeColumn, columnIndex);
+				FrequencyTable table = createFrequencyTable(attributeName, columnComposition, targetComposition);
+				
+				tables.add(table);
+				ProbabilisticModels.add(table);		// testing
+				break;
+			case CONTINUOUS:
+				GaussianDistribution gaussianDistribution = new GaussianDistribution(attributeColumn, targetComposition);
+				
+				
+				ProbabilisticModels.add(gaussianDistribution);
+				break;
+			default:
+				break;			
+			}			
 		}
-
-		FrequencyTable.adjustForZeroFrequencyProblem();
+		
+		FrequencyTable.adjustForZeroFrequencyProblem();		
 	}
 
 	private FrequencyTable createFrequencyTable(String attributeName, Map<String, List<Integer>> columnComposition, Map<String, List<Integer>> targetComposition){
@@ -97,6 +113,10 @@ public class FrequencyTableMaker {
 		return valueArrays;
 	}
 
+	public List<PriorGetter> getPriorModels() {
+		return ProbabilisticModels;
+	}
+	
 	public List<FrequencyTable> getTables() {
 		return tables;
 	}

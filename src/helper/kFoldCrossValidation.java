@@ -1,7 +1,7 @@
 package helper;
 
 import algorithm.Classifier;
-import algorithm.FrequencyTableMaker;
+import algorithm.ProbabilityModelMaker;
 import data.Attribute;
 import data.AttributeCollection;
 import data.FrequencyTable;
@@ -48,7 +48,7 @@ public class kFoldCrossValidation {
 
             // Make the Frequency Tables
             // TODO: Classifier accesses tables via static MAP, this object is not necessary, but it must run so the static table map is created.
-            List<FrequencyTable> frequencyTables = new FrequencyTableMaker(newTrainingSet).getTables();
+            List<FrequencyTable> frequencyTables = new ProbabilityModelMaker(newTrainingSet).getTables();
 
             // Classify
             BigDecimal a = Classifier.classify(newTestingSet);

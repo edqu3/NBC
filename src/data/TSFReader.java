@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +15,10 @@ public class TSFReader {
     public static Attribute[][] getData(String path, AttributeDefinition[] adc){
 
         Attribute[][] attributes = null;
+        CSVReader reader = null;
         // get data from file
         try {
-            CSVReader reader = new CSVReader(new FileReader(path));
+            reader = new CSVReader(new FileReader(path));
             // returns string array of 1 element sub array String[][0]
             // [0] sub array contains unparsed row string. *1
             List<String[]> fullList = reader.readAll();
@@ -40,11 +42,20 @@ public class TSFReader {
                     }
                 }
             }
-            reader.close();            
+                        
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (Exception e){
             System.out.println(e.getMessage());
+            e.printStackTrace();
+            
+            System.exit(1);
+        } finally {
+        	try {
+				reader.close();
+			} catch (IOException e) {				
+				e.printStackTrace();
+			}
         }
 
         return attributes;

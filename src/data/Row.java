@@ -1,5 +1,7 @@
 package data;
 
+import data.AttributeDefinition.TYPE;
+
 public class Row {
 
     public Attribute[] row;
@@ -16,5 +18,4 @@ public class Row {
         Integer target = AttributeDefinition.getAttributeIndexFromName("TARGET");
         return row[target].value;
     }
-
 }
