@@ -6,6 +6,8 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.Map.Entry;
 
+import algorithm.PriorGetter;
+
 /**
  * Frequency Table
  *
@@ -20,7 +22,7 @@ import java.util.Map.Entry;
  * Total = 4 + 3 + 3 + 3 = 13
  *
  */
-public class FrequencyTable{
+public class FrequencyTable implements PriorGetter{
 
 	private static Map<String, FrequencyTable> tables 					= new HashMap<>();
 	private static Map<String, BigDecimal> 	   targetClassProbabilities = new HashMap<>();
@@ -89,8 +91,7 @@ public class FrequencyTable{
     	}
     	
     	table = new BigDecimal[rows][cols];	// P( WIND = strong  | TARGET = yes ) is equivalent to table[strong][yes]
-    	
-    	System.out.println();    	
+    	    	
 	}
     
     public void setTableEntry(String row, String col, BigDecimal e){
@@ -98,13 +99,6 @@ public class FrequencyTable{
     	Integer colIndex = colMap.get(col);
     	table[rowIndex][colIndex] = e;
     }
-
-	public BigDecimal getTableEntry(String row, String col){
-		//bridge key names from key set to a map and its index in this Table
-		Integer rowIndex = rowMap.get(row);
-		Integer colIndex = colMap.get(col);
-		return table[rowIndex][colIndex];
-	}
 
 	public static FrequencyTable getFrequencyTable(String attribute){
 		return tables.get(attribute);
@@ -234,4 +228,17 @@ public class FrequencyTable{
 	public static BigDecimal getTargetClassProbability(String targetClass) {
 		return targetClassProbabilities.get(targetClass);
 	}
+
+	@Override
+	public BigDecimal getPriorProbability(String x, String c) {
+		Integer rowIndex = rowMap.get(x);
+		Integer colIndex = colMap.get(c);
+		return table[rowIndex][colIndex];	
+	}
+	
+	@Override
+	public BigDecimal getMarginalProbability(String x) {
+		return marginals.get(x);
+	}
+
 }

@@ -40,6 +40,7 @@ public class TSFReader {
                     }
                 }
             }
+            reader.close();            
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (Exception e){

@@ -24,9 +24,10 @@ public class kFoldCrossValidation {
      * */
     public static void crossValidate(AttributeCollection ac, int k_folds){
 
-        List<List<Attribute[]>> partitions = partition(ac.data, k_folds);
-        List<Attribute[]> trainingSet  = new ArrayList<>();
-        List<Attribute[]> testingSet   = new ArrayList<>();
+        List<List<Attribute[]>> partitions   = partition(ac.data, k_folds);
+        List<Attribute[]> 		trainingSet  = new ArrayList<>();
+        List<Attribute[]> 		testingSet   = new ArrayList<>();
+        
         BigDecimal accuracy = new BigDecimal(0);
 
         for (int testIndex = 0; testIndex < partitions.size(); testIndex++) {
@@ -59,6 +60,7 @@ public class kFoldCrossValidation {
             // clear and move on to next fold
             trainingSet.clear();
         }
+        // take average
         accuracy = accuracy.divide(new BigDecimal(partitions.size()), MC);
         System.out.println("Overall Accuracy " + accuracy);
     }

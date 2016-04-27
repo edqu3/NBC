@@ -11,4 +11,8 @@ public class Column {
         columnIndex = columnCount;
         columnCount ++;
     }
+    
+    public String getAttributeName(){
+    	return column[0].name;
+    }
 }

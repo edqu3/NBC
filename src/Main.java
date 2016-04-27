@@ -61,15 +61,12 @@ public class Main {
 				new AttributeDefinition("TARGET"  , new String[]{"yes","no"}, 			   	   TYPE.DISCRETE)
 		};
 
-		// get attribute array
+		// get attribute data
 		Attribute[][] attributes = TSFReader.getData("simple.tsv", adc);
-
 		AttributeCollection attributeCollection = new AttributeCollection(attributes);
-
+		
+		// cross validate
 		kFoldCrossValidation.crossValidate(attributeCollection, 5);
-
-		System.out.println();
-
 
 	}
 

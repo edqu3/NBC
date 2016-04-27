@@ -32,8 +32,6 @@ public class AttributeCollection {
         }
 
         cls.toArray(this.columns);
-
-        System.out.println();
     }
 
     public int getColumnLength(){
