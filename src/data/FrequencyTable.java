@@ -231,6 +231,11 @@ public class FrequencyTable implements PriorGetter{
 
 	@Override
 	public BigDecimal getPriorProbability(String x, String c) {
+		if (x.equals("?")){
+//			System.out.println("? found");
+			return BigDecimal.ONE;
+		}
+
 		Integer rowIndex = rowMap.get(x);
 		Integer colIndex = colMap.get(c);
 		return table[rowIndex][colIndex];	

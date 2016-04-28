@@ -64,7 +64,7 @@ public class Main {
 //		};
 
 		// get attribute data
-		Attribute[][] attributes = TSFReader.getData("simple-data-continuous.tsv", adc);
+		Attribute[][] attributes = TSFReader.getData("data.tsv", adc);
 		AttributeCollection attributeCollection = new AttributeCollection(attributes);
 		
 		// cross validate
