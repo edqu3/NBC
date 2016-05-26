@@ -65,65 +65,6 @@ public class kFoldCrossValidation {
         System.out.println("Overall Accuracy " + accuracy);
     }
 
-    /**
-     * Compare each TARGET from the test set against the Decision Tree.
-     * returns the percentage of correct inferences.
-     * */
-//    private static BigDecimal validate(AttributeCollection test_set, DTNode tree, String target){
-//        Attribute[][] rows = test_set.collection;
-//        DTNode original_tree = tree;
-//        BigDecimal correct = BigDecimal.ZERO;
-//        int targetIndex = test_set.getAttributeIndex(target);
-//        for(Attribute[] row : rows){
-//            correct = correct.add(accuracy(tree, row, test_set, targetIndex));
-//            tree = original_tree;
-//        }
-//        return correct.divide(new BigDecimal(rows.length), MC);
-//    }
-
-//    private static BigDecimal accuracy(DTNode tree, Attribute[] row, AttributeCollection test_set, int targetIndex){
-//        if (tree.isValue){
-//            // if at a leaf get its decision
-//            if (tree.isLeaf){
-//                // get decision, assuming there is only 1 branch, the decision.
-//                String treeDecision = tree.name;
-//                String testDecision = row[targetIndex].value;
-//                if( treeDecision.equals(testDecision) ){
-//                    // inferred decision and test data match
-//                    System.out.println("Match " + testDecision);
-//                    return BigDecimal.ONE;
-//                }
-//                else{
-//                    System.out.println("No Match " + testDecision);
-//                    return BigDecimal.ZERO;
-//                }
-//            }
-//            else{
-//                // move on to next node ( an Attribute )
-//                tree = tree.branches.get(0);
-//                return accuracy(tree, row, test_set, targetIndex );
-//
-//            }
-//
-//        }
-//        else if (tree.isAttribute){
-//            // get values for attribute
-//            List<DTNode> branches = tree.branches;
-//            String testNodeValue = row[test_set.getAttributeIndex(tree.name)].value;
-//            boolean found = false;
-//            for(DTNode branch : branches){
-//                if(branch.name.equals(testNodeValue)){
-//                    return accuracy(branch, row, test_set, targetIndex );
-//                }
-//            }
-//            if (found == false){
-//                return BigDecimal.ZERO;
-//            }
-//        }
-//        System.out.println();
-//        return null;
-//    }
-
     private static List<List<Attribute[]>> partition(Attribute[][] original_list, int k_folds){
         int foldSize = (int) Math.ceil((double)original_list.length / k_folds);
 
